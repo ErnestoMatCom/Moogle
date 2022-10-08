@@ -24,39 +24,20 @@ namespace MoogleEngine;
 
 public class Operator{
 
-public static float operatorValue(string query , string word , string nextWord, int rep , IDictionary<string, List<Position> > document ){
+public static float operatorValue(string query , string word , string nextWord, int position , IDictionary<string, List<Position> > document ){
 
   float value = 0.0f;//score final segun operadores
-  int position  = 0;//posicion de la palabra en el query
-  string subQuery ;//esta variable es para el caso de que se repita la palabra
   char op ;//esto guarda el operador
   float importance = 0.0f;//para el operador de importancia *
-
-//esto para en caso de que la palabra se repita este bucle solo tomara lo que existe desde esta repeticion de word hasta el final
-//y comprueba los operadores anteriores a este subString
-
-  if(rep > 1 ){
-
-   for( int c = 0;c < rep;c++ ){
-
-     subQuery = query.Substring(position + 1);
-
-     position = subQuery.IndexOf(word);   
-  
-
-   }//fin de for
-
-  }else{
-
-   position = query.IndexOf(word);  
-
-  }//fin de if-else
-
+ 
 
 //si la posicion de la palabra es 0 ( o sea esta al principio de query entonces no hay operador y comprobar si existe genera un error  )
 //en caso contrario guarda el caracter anterior a word
+
   if( position != 0 ){ 
+  
   op = query[position - 1];
+  
 
   }else{
  
@@ -65,7 +46,7 @@ public static float operatorValue(string query , string word , string nextWord, 
 
   }
 
-
+  
 
   switch(op){
 
@@ -83,14 +64,21 @@ public static float operatorValue(string query , string word , string nextWord, 
 
    case '*'://operador de importancia, retorna la cantidad de "*" mas 1
    
-   
-    for( int c = 0; query[position - 1 - c] == '*'; c++ ){
+   if(document.ContainsKey(word)){
+
+    for( int c = 0; position -1 - c >=0 && query[position - 1 - c] == '*' ; c++ ){//*********
 
       importance++;
 
     }
 
     value = importance + 1.0f;
+
+   }else{
+
+     value = 1;
+
+   }
 
    break;
 
@@ -103,24 +91,25 @@ public static float operatorValue(string query , string word , string nextWord, 
 
   }
 
+  
 
+//como el operador de cercania comprueba si esta al final de la palabra y los demas al principio entonces esta fuera del switch
 
-try{//como el operador de cercania comprueba si esta al final de la palabra y los demas al principio entonces esta fuera del switch
+if((query.Length > position + word.Length) && (nextWord != word) && (query[ position + word.Length  ] == '~' )){
 
-if( query[ position + word.Length ] == '~' ){
+try{
 
-value = 100 / close(document[word].ToArray() , document[nextWord].ToArray() );//si esto genera error es que la palabra no esta en el documento entonces retorna 1
-
-}
+value =  close(document[word].ToArray() , document[nextWord].ToArray() );//si esto genera error es que la palabra no esta en el documento entonces retorna 0
 
 }catch{
 
-value = 1.0f;
+value = 0.0f;
+
+}
 
 }
 
 
-  
 return value;
   
 }
@@ -138,19 +127,25 @@ private static float close( Position[] left , Position[] right ){//comprobar cer
   //este metodo comprueba los numeros de las dos listas de posiciones y toma la menor diferencia entre las posiciones de las dos 
   
   for(int c = 0 ; c < (left.Length + right.Length) ; c++ ){
+    
+    if( ( r < right.Length ) && ( l < left.Length ) ){
 
-    if(right[r].line >= left[l].line){
+    if( right[r].line >= left[l].line && r < right.Length ){
 
-      r++;
+
+      
+
       if( Math.Abs( left[l].line - right[r].line) < minDist ){
 
        minDist = Math.Abs( left[l].line - right[r].line ) ;
 
       }
 
-    }else{
-
-       l++;
+     r++;
+    }
+    
+    if(right[r].line < left[l].line && l < left.Length ){
+       
 
        if( Math.Abs( left[l].line - right[r].line) < minDist ){
 
@@ -158,11 +153,17 @@ private static float close( Position[] left , Position[] right ){//comprobar cer
 
       }   
 
-    }//fin de if-else
+     l++;
+
+    }
+
+  }
+
+  
 
   }//fin de for
 
-  return minDist;
+  return 1/minDist;
 
 
 
