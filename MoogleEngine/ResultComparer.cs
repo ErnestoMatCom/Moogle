@@ -8,7 +8,7 @@ public class ResultComparer : IComparer{
 
   public int Compare(object x , object y){
 
-    return ( new CaseInsensitiveComparer()).Compare(((SearchItem)x).Score,((SearchItem)y).Score);
+    return ( new CaseInsensitiveComparer() ).Compare( ( (SearchItem)x ).Score,((SearchItem)y).Score);
 
   }
 

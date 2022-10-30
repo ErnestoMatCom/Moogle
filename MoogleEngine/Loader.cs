@@ -68,12 +68,8 @@ for(int d = 0; d < documents.Length;d++){//recorre cada documento en el array ma
 reader.Close();//cierra el stream
 }
 
-
-   }
-
-try{//guarda el peso de cada palabra segun el documento si no hay documentos lanza una excepcion 
-
-   for(int d = 0 ; d < Loader.matrix.Length ; d++){
+//carga el peso de los documentos
+for(int d = 0 ; d < Loader.matrix.Length ; d++){
 
    weight[d] = new Dictionary<string,float>(); 
 
@@ -87,12 +83,11 @@ try{//guarda el peso de cada palabra segun el documento si no hay documentos lan
    }
    }
     
-}catch{
-
+   }else{
+   
 throw new Exception("NO HAY DOCUMENTOS");
 
-}
-
+   }
  }
 
 }

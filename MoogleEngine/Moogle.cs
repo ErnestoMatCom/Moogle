@@ -50,7 +50,7 @@ public static class Moogle
 
         for(int c = 0;c < Loader.documents.Length;c++){//recorre todos los documentos
 
-         score = Score.score( search , c ) ;//halla el score de ese documentos
+         score = Score.score( search , c ) ;//halla el score de ese documento
 
          if(search.Length > r + 1  ){
  
@@ -78,8 +78,7 @@ public static class Moogle
 
           
           }
-         
-          
+               
 
           try{//crea el snippet de la ultima palabra de la busqueda en ese documento si no esta da error y  deja el snippet como esta hasta ese momento
 
